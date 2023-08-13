@@ -1,11 +1,6 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'dart:typed_data';
-import 'package:flutter_sound/flutter_sound.dart';
 import 'package:overdriveapp/layout/knobs/pedal_knob.dart';
 import 'package:overdriveapp/layout/buttons/metal_button.dart';
-import 'package:flutter/services.dart' show rootBundle;
 
 class OverdrivePage extends StatefulWidget {
   @override
@@ -18,100 +13,46 @@ class _OverdrivePageState extends State<OverdrivePage> {
   bool _isOn = false;
 
 // Audio settings
-
-  static const int _tSampleRate = 44100;
-  static const int _tNumChannels = 1;
-  static const _audioRawPath = 'assets/cleanGuitar.wav';
-
-  FlutterSoundPlayer? _mPlayer = FlutterSoundPlayer();
-  late bool _mPlayerIsInited;
-  Uint8List? audioArrayData;
+  bool _mPlayerIsInited = false;
   bool busy = false;
-
-  Future<Uint8List> process(String path) async {
-    var asset = await rootBundle.load(path);
-    List<int> assetBuffer = asset.buffer.asUint8List();
-    List<int> assetBufferCopy = List.from(assetBuffer);
-    for (int i = 0; i < assetBuffer.length; i++) {
-      // Normalize amplitude between 0,1
-      double value = (assetBuffer[i].toDouble() / 128.0 - 1.0);
-      // validation to avoid crash
-      if (_gainValue > 0) {
-        // applies distortion or add gain.
-        value = (value.abs() * value.abs() * _gainValue * 2.0).toDouble();
-      }
-      // transform to 255 byte value
-      assetBufferCopy[i] = (value * 128.0 + 128.0).toInt();
-    }
-    return Uint8List.fromList(assetBufferCopy);
-  }
-
-  Future<void> init() async {
-    await _mPlayer!.openPlayer();
-    audioArrayData = FlutterSoundHelper().waveToPCMBuffer(
-      inputBuffer: await process(_audioRawPath),
-    );
-    await _mPlayer!.startPlayerFromStream(
-      codec: Codec.pcm16,
-      numChannels: _tNumChannels,
-      sampleRate: _tSampleRate,
-    );
-  }
 
   @override
   void initState() {
     super.initState();
-    // here we load the buffer that we will play.
-    init().then((value) => setState(() {
-          _mPlayerIsInited = true;
-        }));
+    // Here we initiate the audio processing.
   }
 
   @override
   void dispose() {
-    _mPlayer!.stopPlayer();
-    _mPlayer!.closePlayer();
-    _mPlayer = null;
-
+    // Here we execute dispose of the audio.
     super.dispose();
   }
 
-  void play(Uint8List? data) async {
+  void play() async {
     if (!busy && _mPlayerIsInited) {
       busy = true;
-      await _mPlayer!.feedFromStream(data!).then((value) => busy = false);
+      print("===================================> paying!!!");
     }
   }
 
   void stop() {
     busy = false;
-    _mPlayer!.stopPlayer();
-  }
-
-  void initAndPlay() async {
-    await init(); // we reload the init with the new gain value.
-    play(audioArrayData);
+    print("===================================> stopped!!!");
+    // stop here!
   }
 
   void _onGainChanged(double value) {
     setState(() {
       _gainValue = value;
     });
-    // Apply gain changes to audio processing
-    // Your implementation goes here
+    // send gain update here!
   }
 
   void _onLevelChanged(double value) async {
     setState(() {
       _levelValue = value;
     });
-
-    //method to control volume natively
-
-    await _mPlayer?.setVolume(value);
-
-    // Apply level changes to audio processing
-    // Your implementation goes here
+    // send update volume here!
   }
 
   void _togglePower() {
@@ -223,7 +164,7 @@ class _OverdrivePageState extends State<OverdrivePage> {
                   MetallicButton(
                     onPressed: () {
                       if (!_isOn) {
-                        initAndPlay();
+                        play();
                       } else {
                         stop();
                       }
