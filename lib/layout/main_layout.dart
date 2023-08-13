@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:overdriveapp/layout/knobs/pedal_knob.dart';
 import 'package:overdriveapp/layout/buttons/metal_button.dart';
+// import our processor
+import 'package:overdriveapp/core/process.dart';
 
 class OverdrivePage extends StatefulWidget {
   @override
@@ -9,22 +11,31 @@ class OverdrivePage extends StatefulWidget {
 
 class _OverdrivePageState extends State<OverdrivePage> {
   double _gainValue = 0.5;
-  double _levelValue = 0.7;
+  double _levelValue = 0.5;
   bool _isOn = false;
 
 // Audio settings
   bool _mPlayerIsInited = false;
   bool busy = false;
+  // Processor object
+  Process processor = Process(
+      audioRawPath: 'assets/cleanGuitar.wav',
+      tSampleRate: 44100,
+      tNumChannels: 2);
 
   @override
   void initState() {
     super.initState();
-    // Here we initiate the audio processing.
+    // Initiate first gain value
+    processor.updateGain(_gainValue);
+    // first initialization
+    processor.init().then((value) => setState(() => _mPlayerIsInited = true));
   }
 
   @override
   void dispose() {
     // Here we execute dispose of the audio.
+    processor.dispose();
     super.dispose();
   }
 
@@ -32,13 +43,18 @@ class _OverdrivePageState extends State<OverdrivePage> {
     if (!busy && _mPlayerIsInited) {
       busy = true;
       print("===================================> paying!!!");
+      // re-init to update values of gain.
+      await processor.init();
+      // play audio
+      processor.play().then((value) => busy = false);
     }
   }
 
   void stop() {
     busy = false;
     print("===================================> stopped!!!");
-    // stop here!
+    // stop playing audio here!
+    processor.stop();
   }
 
   void _onGainChanged(double value) {
@@ -46,6 +62,7 @@ class _OverdrivePageState extends State<OverdrivePage> {
       _gainValue = value;
     });
     // send gain update here!
+    processor.updateGain(value);
   }
 
   void _onLevelChanged(double value) async {
@@ -53,6 +70,7 @@ class _OverdrivePageState extends State<OverdrivePage> {
       _levelValue = value;
     });
     // send update volume here!
+    processor.updateVolume(value);
   }
 
   void _togglePower() {
