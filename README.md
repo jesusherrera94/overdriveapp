@@ -12,8 +12,8 @@ This is an app that takes an audio file and applies an overdrive to it!
 
 Helpful documentation is in the following links:
 1. Audio theory: [link to docs](https://docs.google.com/document/d/17dNskDEHrdbJIFIjJdz14ALD88HLGdBqRjMoFj4HiQo/edit?usp=sharing).
-2. Audio Presentation: [link ppt](https://docs.google.com/presentation/d/1sQCD6c2s1w3r5DLzBASFZG1P3eZXjJXIGei7ty56MCc/edit?usp=sharing)
-3. Algorithm behavior: [link to calc](https://docs.google.com/spreadsheets/d/1ag9R1tYSgIRal5PO61icxDJS8EUvx6td9cEMrhQkPxc/edit?usp=sharing)
+2. Audio Presentation: [link ppt](https://docs.google.com/presentation/d/1sQCD6c2s1w3r5DLzBASFZG1P3eZXjJXIGei7ty56MCc/edit?usp=sharing).
+3. Algorithm behavior: [link to calc](https://docs.google.com/spreadsheets/d/1ag9R1tYSgIRal5PO61icxDJS8EUvx6td9cEMrhQkPxc/edit?usp=sharing).
 
 ## Integration
 
